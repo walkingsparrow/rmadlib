@@ -7,14 +7,14 @@ db.connect(host="localhost", user="qianh1", dbname="qianh1")
 
 db.listTables()
 
-db.listColumnNames("test2")
+db.listColumnNames("cv_model1")
 
 ## x <- new("indb.created")
 ## y <- new("indb.uncreated")
 
 db.getQuery("create table test3(zid integer, val double precision[])")
 
-test <- data.frame.indb("test1")
+test <- data.frame.indb("cv_model1")
 
 dim(test)
 

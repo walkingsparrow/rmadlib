@@ -23,3 +23,4 @@ con.pkg <- function (con.id = 1)
     i <- which(tolower(.supported.connections) == pkg)
     .supported.connections[i]
 }
+

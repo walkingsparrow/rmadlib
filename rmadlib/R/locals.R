@@ -15,15 +15,15 @@
 ## The R object has its corresponding table/view in database
 setClass("indb.created",
          representation(
-             .name = "character", # table name
+             .name = "character", # object name
              .con.id = "numeric", # connection ID
              ## used for identify connection
              .dbname = "character", # database name
              .host = "character", # database server
              .con.pkg = "character", # R package used for connection
              ## table properties
-             .col.names = "character", # column names
-             .col.types = "character" # column types
+             ## .col.names = "character", # column names
+             ## .col.types = "character" # column types
              )
          )
 
