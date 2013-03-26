@@ -21,11 +21,19 @@ db.lm <- function(formula, data)
     f.terms <- terms(formula, data = fake.data) # formula terms
     f.factors <- attr(f.terms, "factors") # the 1st is the dependent variable
     f.labels <- attr(f.terms, "term.labels") # each terms on the right side
+    f.intercept <- attr(f.terms, "intercept")
     labels <- gsub(":", "*", f.labels) # replace interaction : with *
     labels <- gsub("I\\((.*)\\)", "\\1", labels) # remove I()
     ##
     dep.var <- rownames(f.factors)[1] # dependent variable
-    ind.var <- paste("array[", paste(labels, collapse = ","), "]", sep = "") # independent variable
+    ## with or without intercept
+    if f.intercept == 0:
+        intercept.str <- ""
+    else
+        intercept.str <- "1,"
+    ind.var <- paste("array[", intercept.str,
+                     paste(labels, collapse = ","),
+                     "]", sep = "") # independent variable
     ## should return an object with class lm.db
     ## so that predict.lm.db can be defined and used
 
