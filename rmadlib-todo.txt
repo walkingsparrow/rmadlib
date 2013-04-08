@@ -117,3 +117,7 @@ DONE * conn_attr utilities all need to validate conn.id
 * Let "conn.id<-" change conn.id for multiple objects together
 
 * Deal with svec
+
+* Use "try" to avoid temp table garbage, need to check every function
+
+* partition function, prepare for CV
