@@ -117,3 +117,7 @@ DONE * conn_attr utilities all need to validate conn.id
 * Let "conn.id<-" change conn.id for multiple objects together
 
 * Deal with svec
+
+* function to list schema
+
+* function to list tables given schema
