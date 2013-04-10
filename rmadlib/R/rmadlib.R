@@ -10,7 +10,7 @@ rmadlib <- function ()
     ## gui folder installation path
     gui.dir <- paste(.localVars$pkg.path, "/gui", sep = "")
 
-    cat("\nWelcome to poor men's Alpine ...\n")
+    message("\nWelcome to poor men's Alpine. It is free ...\n")
+    message("Press Ctrl + c to stop.")
     runApp(gui.dir)
-    cat("\nSee you later\n\n")
 }
