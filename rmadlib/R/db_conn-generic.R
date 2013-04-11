@@ -78,9 +78,10 @@ db.disconnect <- function (conn.id = 1, verbose = TRUE)
     res <- eval(parse(text = command))
     if (res)
     {
-        .localVars$db[[conn.id]] <- NULL
+        .localVars$db[[idx]] <- NULL
         .localVars$conn.type[[conn.pkg]] <- .localVars$conn.type[[conn.pkg]][-which(.localVars$conn.type[[conn.pkg]]==conn.id)]
         .localVars$conn.id <- .localVars$conn.id[.localVars$conn.id[,1] != conn.id,] # delete the conn.id from the array
+        if (length(.localVars$db) == 1) .localVars$conn.id <- matrix(.localVars$conn.id, nrow = 1)
 
         ## update conn.id mapping info
         for (i in seq_len(length(.localVars$db)))

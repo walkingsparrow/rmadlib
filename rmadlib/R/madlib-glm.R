@@ -14,16 +14,28 @@ madlib.glm <- function (formula, data, family = "gaussian",
     args$formula <- formula
     args$data <- data
     args$na.action <- na.action
-    args$call <- deparse(match.call())
+    call <- deparse(match.call())
     
     if (tolower(family) == "gaussian" || tolower(family) == "linear")
-        return (do.call(madlib.lm, args))
+    {
+        fit <- do.call(madlib.lm, args)
+        fit$call <- call
+        return (fit)
+    }
 
     if (tolower(family) == "binomial" || tolower(family) == "logistic")
-        return (do.call(.madlib.logregr, args))
+    {
+        fit <- do.call(.madlib.logregr, args)
+        fit$call <- call
+        return (fit)
+    }
 
     if (family == "multinomial")
-        return (do.call(.madlib.mlogregr, args))
+    {
+        fit <- do.call(.madlib.mlogregr, args)
+        fit$call <- call
+        return (fit)
+    }
 
     cat("\nThe family", family, "is not supported!\n")
     return
@@ -32,7 +44,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
 ## ------------------------------------------------------------------------
 
 .madlib.logregr <- function (formula, data, na.action, method = "irls",
-                             max_iter = 10000, tolerance = 1e-5, call)
+                             max_iter = 10000, tolerance = 1e-5)
 {
     ## make sure fitting to db.obj
     if (! inherits(data, "db.obj"))

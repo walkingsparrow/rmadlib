@@ -8,7 +8,7 @@
 ## in MADlib
 ## method is also a place holder, right now only one method
 madlib.lm <- function (formula, data, na.action, method,
-                       hetero = FALSE) # param name too long
+                       hetero = FALSE, ...) # param name too long
 {
     ## make sure fitting to db.obj
     if (! inherits(data, "db.obj"))
@@ -81,7 +81,7 @@ madlib.lm <- function (formula, data, na.action, method,
     rst$has.intercept <- params$has.intercept # do we have an intercept
     rst$ind.vars <- params$ind.vars
     rst$call <- deparse(match.call()) # the current function call itself
-
+    
     class(rst) <- "lm.madlib" # use this to track summary
     rst
 }
