@@ -201,6 +201,8 @@ db.list <- function ()
     eval(parse(text = command))
 }
 
+## ------------------------------------------------------------------------
+
 .db.existsTempTable <- function (table, conn.id = 1)
 {
     if (length(table) == 2)
@@ -255,7 +257,7 @@ db.list <- function ()
     id <- .localVars$conn.id[.localVars$conn.id[,1] == conn.id, 2]
     command <- paste(".db.writeTable.", .localVars$db[[id]]$conn.pkg,
                      "(table=table, r.obj=r.obj, add.row.names=add.row.names,
-                      overwrite=overwrite, append=append,
+                      overwrite=overwrite, append=append, conn.id=conn.id,
                       distributed.by=distributed.by,
                       is.temp=is.temp, idx=id,
                       header=header, nrows=nrows, sep=sep, eol=eol,

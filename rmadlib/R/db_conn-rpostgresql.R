@@ -11,11 +11,13 @@
         .localVars$drv$rpostgresql <- DBI::dbDriver("PostgreSQL")
     
     n.db <- length(.localVars$db)
-    db.connection <- RPostgreSQL::dbConnect(.localVars$drv$rpostgresql,
-                                            host=host, user=user,
-                                            dbname=dbname,
-                                            password=password,
-                                            port = port)
+    func <- getMethod("dbConnect", signature="PostgreSQLDriver",
+                      where=as.environment("package:RPostgreSQL"))
+    db.connection <- func(.localVars$drv$rpostgresql,
+                         host=host, user=user,
+                         dbname=dbname,
+                         password=password,
+                         port = port)
     if (length(.localVars$conn.id) == 0)
         conn.id <- 1
     else
@@ -45,56 +47,78 @@
 
 .db.unloadDriver.rpostgresql <- function(drv)
 {
-    RPostgreSQL::dbUnloadDriver(drv)
+    func <- getMethod("dbUnloadDriver", signature="PostgreSQLDriver",
+                      where=as.environment("package:RPostgreSQL"))
+    func(drv)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.disconnect.rpostgresql <- function(idx)
 {
-    RPostgreSQL::dbDisconnect (.localVars$db[[idx]]$conn)
+    func <- getMethod("dbDisconnect", signature="PostgreSQLConnection",
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.sendQuery.rpostgresql <- function(query, idx)
 {
-    RPostgreSQL::dbSendQuery(.localVars$db[[idx]]$conn, query)
+    func <- getMethod("dbSendQuery",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn, query)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.fetch.rpostgresql <- function(res, n)
 {
-    RPostgreSQL::fetch(res, n)
+    func <- getMethod("fetch",
+                      signature=c("PostgreSQLResult", "numeric"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(res, n)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.getQuery.rpostgresql <- function(query, idx)
 {
-    RPostgreSQL::dbGetQuery(.localVars$db[[idx]]$conn, query)
+    func <- getMethod("dbGetQuery",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn, query)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.listTables.rpostgresql <- function(idx)
 {
-    RPostgreSQL::dbListTables(.localVars$db[[idx]]$conn)
+    func <- getMethod("dbListTables",
+                      signature="PostgreSQLConnection",
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.existsTable.rpostgresql <- function(table, idx)
 {
-    RPostgreSQL::dbExistsTable(.localVars$db[[idx]]$conn, table)
+    func <- getMethod("dbExistsTable",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn, table)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.listFields.rpostgresql <- function(table, idx)
 {
-    RPostgreSQL::dbListFields(.localVars$db[[idx]]$conn, table)
+    func <- getMethod("dbListFields",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(.localVars$db[[idx]]$conn, table)
 }
 
 ## ------------------------------------------------------------------------
@@ -102,6 +126,9 @@
 .db.buildTableDefinition <- function(dbObj, name, obj, field.types,
                                      add.row.names, dist.str, is.temp, ...)
 {
+    func <- getMethod("dbDataType",
+                      signature=c("PostgreSQLObject", "ANY"),
+                      where=as.environment("package:RPostgreSQL"))
     if(!is.data.frame(obj))
         obj <- as.data.frame(obj)
     if(!is.null(add.row.names) && add.row.names){
@@ -111,7 +138,7 @@
     if(is.null(field.types)){
         ## the following mapping should be coming from some kind of table
         ## also, need to use converter functions (for dates, etc.)
-        field.types <- sapply(obj, RPostgreSQL::dbDataType, dbObj = dbObj)
+        field.types <- sapply(obj, func, dbObj = dbObj)
     }
 
     ## need to create a new (empty) table
@@ -129,7 +156,7 @@
 
 .db.writeTable.rpostgresql <- function (table, r.obj, add.row.names, 
                                         overwrite, append, distributed.by,
-                                        is.temp,
+                                        is.temp, 
                                         idx, header, nrows = 50, sep = ",",
                                         eol="\n", skip = 0, quote = '"',
                                         field.types, ...)
@@ -138,6 +165,19 @@
     conn.id <- .localVars$db[[idx]]$conn.id
     name <- table
     value <- r.obj
+
+    func1 <- getMethod("dbClearResult",
+                       signature="PostgreSQLResult",
+                       where=as.environment("package:RPostgreSQL"))
+    func2 <- getMethod("dbWriteTable",
+                       signature=c("PostgreSQLConnection", "character",
+                       "character"),
+                       where=as.environment("package:RPostgreSQL"))
+    func3 <- getMethod("dbWriteTable",
+                       signature=c("PostgreSQLConnection", "character",
+                       "data.frame"),
+                       where=as.environment("package:RPostgreSQL"))
+    
     ## only for GPDB
     ## This why this function is so complicated
     if (is.null(distributed.by)) {
@@ -163,12 +203,12 @@
                 check.temp <- .db.existsTempTable(name, conn.id)
                 name <- check.temp[[2]]
             }
-            if((!is.temp && RPostgreSQL::dbExistsTable(conn,name)) ||
+            if((!is.temp && .db.existsTable(name, conn.id)) ||
                (is.temp && check.temp[[1]]))
             {
                 if(overwrite)
                 {
-                    if(!RPostgreSQL::dbRemoveTable(conn, name))
+                    if(!.db.removeTable(name, conn.id))
                     {
                         warning(paste("table", name,
                                       "couldn't be overwritten"))
@@ -207,7 +247,7 @@
                     add.row.names <- FALSE
             }
             
-            new.table <- !RPostgreSQL::dbExistsTable(conn, name)
+            new.table <- !.db.existsTable(name, conn.id)
             if(new.table)
             {
                 ## need to init table, say, with the first nrows lines
@@ -217,13 +257,13 @@
                 sql <- .db.buildTableDefinition(new.con, table, d,
                                                 field.types, add.row.names,
                                                 dist.str, is.temp)
-                rs <- try(RPostgreSQL::dbSendQuery(new.con, sql))
+                rs <- try(.db.sendQuery(sql, conn.id))
                 if(inherits(rs, RPostgreSQL:::ErrorClass)){
                     warning("could not create table: aborting postgresqlImportFile")
                     return(FALSE)
                 }
                 else
-                    RPostgreSQL::dbClearResult(rs)
+                    func1(rs)
             }
             else if(!append)
             {
@@ -232,22 +272,22 @@
             }
 
             ## After the table has been created, one can append data to it
-            RPostgreSQL::dbWriteTable(conn = .localVars$db[[idx]]$conn,
-                                      name = name, value = value,
-                                      overwrite = overwrite, append = TRUE,
-                                      header = header, nrows = nrows,
-                                      sep = sep,
-                                      eol=eol, skip = skip, quote = quote,
-                                      field.types = field.types, ...)
+            func2(conn = .localVars$db[[idx]]$conn,
+                  name = name, value = value,
+                  overwrite = overwrite, append = TRUE,
+                  header = header, nrows = nrows,
+                  sep = sep,
+                  eol=eol, skip = skip, quote = quote,
+                  field.types = field.types, ...)
         }
         else # create table from a data frame --------------------------------
         {
             if (is.temp) check.temp <- .db.existsTempTable(table, conn.id)
-            if((!is.temp && RPostgreSQL::dbExistsTable(conn, name)) ||
+            if((!is.temp && .db.existsTable(name, conn.id)) ||
                (is.temp && check.temp[[1]]))
             {
                 if (overwrite) {
-                    if (!RPostgreSQL::dbRemoveTable(conn, name))
+                    if (!.db.removeTable(name, conn.id))
                     {
                         warning(paste("table", name,
                                       "couldn't be overwritten"))
@@ -268,7 +308,7 @@
                 sql <- .db.buildTableDefinition(conn, table, r.obj,
                                                 field.types, add.row.names,
                                                 dist.str, is.temp)
-                rs <- try(RPostgreSQL::dbSendQuery(conn, sql))
+                rs <- try(.db.sendQuery(sql, conn.id))
                 if (is.temp) name <- (.db.existsTempTable(table,
                                                           conn.id))[[2]]
                 if(inherits(rs, RPostgreSQL:::ErrorClass))
@@ -278,15 +318,15 @@
                 }
                 else
                 {
-                    RPostgreSQL::dbClearResult(rs)
+                    func1(rs)#######
                 }
             }
 
             ## After the table has been created, one can append data to it
-            RPostgreSQL::dbWriteTable(conn = .localVars$db[[idx]]$conn,
-                                      name = name, value = value,
-                                      row.names = add.row.names,
-                                      overwrite = overwrite, append = TRUE)
+            func3(conn = .localVars$db[[idx]]$conn,
+                  name = name, value = value,
+                  row.names = add.row.names,
+                  overwrite = overwrite, append = TRUE)
         }
     }
 }
@@ -295,14 +335,20 @@
 
 .db.readTable.rpostgresql <- function (table, row.names, idx)
 {
-    RPostgreSQL::dbReadTable(conn = .localVars$db[[idx]]$conn,
-                             name = table, row.names = row.names)
+    func <- getMethod("dbReadTable",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(conn = .localVars$db[[idx]]$conn,
+         name = table, row.names = row.names)
 }
 
 ## ------------------------------------------------------------------------
 
 .db.removeTable.rpostgresql <- function (table, idx)
 {
-    RPostgreSQL::dbRemoveTable(conn = .localVars$db[[idx]]$conn,
-                               name = table)
+    func <- getMethod("dbRemoveTable",
+                      signature=c("PostgreSQLConnection", "character"),
+                      where=as.environment("package:RPostgreSQL"))
+    func(conn = .localVars$db[[idx]]$conn,
+         name = table)
 }
