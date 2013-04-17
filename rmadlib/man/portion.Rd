@@ -1,6 +1,6 @@
-\name{portion}
+\name{preview}
 
-\alias{portion}
+\alias{preview}
 
 \title{
   Read the actual data stored in the table of database
@@ -9,7 +9,7 @@
   The function reads the actual data from the table in the database.
 }
 \usage{
-portion(x, nrows = 100, interactive = TRUE)
+preview(x, nrows = 100, interactive = TRUE)
 }
 
 \arguments{
@@ -51,7 +51,7 @@ portion(x, nrows = 100, interactive = TRUE)
 \dontrun{
 
 x <- db.data.frame("table_in_database", conn.id = 1)
-portion(x, nrows = 10, interactive = FALSE) # extract 10 rows of data
+preview(x, nrows = 10, interactive = FALSE) # extract 10 rows of data
 }
 }
 

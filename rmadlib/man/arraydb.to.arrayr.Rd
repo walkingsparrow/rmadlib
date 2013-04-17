@@ -71,7 +71,7 @@ arraydb.to.arrayr(str, type = "double")
 }
 
 \seealso{
-  \code{\link{portion}} extracts the data of a table 
+  \code{\link{preview}} extracts the data of a table 
 }
 
 \examples{
@@ -89,7 +89,7 @@ arraydb.to.arrayr(str, "character") # c("a", "b", "\"c, d\"")
 
 ## table_in_database has a column of arrays
 x <- db.data.frame("table_in_database", conn.id = 1)
-dat <- portion(x, nrows = 50) # extract the actual data
+dat <- preview(x, nrows = 50) # extract the actual data
 arraydb.to.arrayr(dat$col.array, "double") # an array of 50 rows
 }
 }

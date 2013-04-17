@@ -10,8 +10,8 @@ is.db.data.frame <- function (x)
 
 ## ------------------------------------------------------------------------
 
-## Grab a portion of the data
-portion <- function(x, nrows = 100, interactive = TRUE)
+## Grab a preview of the data
+preview <- function(x, nrows = 100, interactive = TRUE)
 {
     if (! inherits(x, "db.data.frame"))
         stop(deparse(substitute(x)), " must be a db.data.frame object!")
@@ -20,7 +20,7 @@ portion <- function(x, nrows = 100, interactive = TRUE)
         cat(deparse(substitute(x)),
             "points to a view in the database",
             dbname(conn.id(x)),
-            "and it takes time to evaluate and extract portion of it !\n")
+            "and it takes time to evaluate and extract a preview of it !\n")
         go <- .read.input("Do you really want to continue ? (Yes/No) : ",
                           c("yes", "y", "no", "n"))
         if (go == "no" || go == "n") return
