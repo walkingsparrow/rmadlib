@@ -11,15 +11,15 @@ names(x)
 
 dim(x)
 
-portion(x, 10)
+preview(x, 10)
 
 ## linear regression conditioned on nation value
 ## i.e. grouping
-fit <- madlib.lm(interlocks ~ . | nation, data = x, heteroskedasticity = T)
+fit <- madlib.lm(interlocks ~ . | nation, data = x, hetero = T)
 
 fit
 
-fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2), data = x, heteroskedasticity = T)
+fit <- madlib.lm(interlocks ~ assets + sector + nation + I(assets^2), data = x, hetero = T)
 
 fit
 

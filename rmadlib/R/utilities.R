@@ -5,7 +5,7 @@
 
 is.db.data.frame <- function (x)
 {
-    inherits(x, "db.data.frame")
+    is(x, "db.data.frame")
 }
 
 ## ------------------------------------------------------------------------
@@ -13,10 +13,10 @@ is.db.data.frame <- function (x)
 ## Grab a preview of the data
 preview <- function(x, nrows = 100, interactive = TRUE)
 {
-    if (! inherits(x, "db.data.frame"))
+    if (! is(x, "db.data.frame"))
         stop(deparse(substitute(x)), " must be a db.data.frame object!")
 
-    if (inherits(x, "db.view") && interactive) {
+    if (is(x, "db.view") && interactive) {
         cat(deparse(substitute(x)),
             "points to a view in the database",
             dbname(conn.id(x)),

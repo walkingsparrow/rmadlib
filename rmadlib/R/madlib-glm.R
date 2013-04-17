@@ -47,7 +47,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
                              max_iter = 10000, tolerance = 1e-5)
 {
     ## make sure fitting to db.obj
-    if (! inherits(data, "db.obj"))
+    if (! is(data, "db.obj"))
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
 
@@ -59,7 +59,7 @@ madlib.glm <- function (formula, data, family = "gaussian",
     
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
-    if (inherits(data, "db.Rquery"))
+    if (is(data, "db.Rquery"))
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
@@ -86,13 +86,13 @@ madlib.glm <- function (formula, data, family = "gaussian",
 
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
-    if (inherits(res, .err.class))
+    if (is(res, .err.class))
         stop("Could not run MADlib logistic regression !")
 
     ## retreive result
     res <- try(.db.getQuery(paste("select * from", tbl.output), conn.id),
                silent = TRUE)
-    if (inherits(res, .err.class))
+    if (is(res, .err.class))
         stop("Could not retreive MADlib linear regression result !")
 
     ## drop temporary tables

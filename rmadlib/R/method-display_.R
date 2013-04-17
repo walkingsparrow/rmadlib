@@ -10,12 +10,12 @@ setMethod (
     signature (x = "db.data.frame"),
     function (x) {
         if (x@.table.type == "LOCAL TEMPORARY") {
-            if (inherits(x, "db.view"))
+            if (is(x, "db.view"))
                 temp <- "Temp view"
             else
                 temp <- "Temp table"
         } else {
-            if (inherits(x, "db.view"))
+            if (is(x, "db.view"))
                 temp <- "View"
             else
                 temp <- "Table"

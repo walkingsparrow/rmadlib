@@ -19,7 +19,7 @@ setMethod (
 
 content <- function (x)
 {
-    if (! inherits(x, "db.obj"))
+    if (! is(x, "db.obj"))
         stop("The argument must be a db.obj-class object!")
 
     x@.content
@@ -29,14 +29,14 @@ content <- function (x)
 
 conn.id <- function (x)
 {
-    if (! inherits(x, "db.obj"))
+    if (! is(x, "db.obj"))
         stop("The argument must be a db.obj-class object!")
     x@.conn.id
 }
 
 "conn.id<-" <- function (x, value = 1)
 {
-    if (! inherits(x, "db.obj"))
+    if (! is(x, "db.obj"))
         stop("The argument must be a db.obj-class object!")
     if (! .is.conn.id.valid(value))
         stop("There is no such a connection!")

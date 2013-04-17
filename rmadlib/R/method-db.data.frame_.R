@@ -42,7 +42,7 @@ db.data.frame <- function (x, conn.id = 1, key = character(0))
     res@.col.data_type <- col.info$data_type
     res@.col.udt_name <- col.info$udt_name
 
-    if (inherits(res, "db.table")) {
+    if (is(res, "db.table")) {
         ## compute dim
         col.num <- length(res@.col.name)
         row.num <- .db.getQuery(paste("select count(*) from", x), conn.id)

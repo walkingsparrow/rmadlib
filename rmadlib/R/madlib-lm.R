@@ -6,12 +6,11 @@
 ## na.action is a place holder
 ## will implement later in R (using temp table), or will implement
 ## in MADlib
-## method is also a place holder, right now only one method
-madlib.lm <- function (formula, data, na.action, method,
+madlib.lm <- function (formula, data, na.action, 
                        hetero = FALSE, ...) # param name too long
 {
     ## make sure fitting to db.obj
-    if (! inherits(data, "db.obj"))
+    if (! is(data, "db.obj"))
         stop("madlib.lm cannot be used on the object ",
              deparse(substitute(data)))
 
@@ -23,7 +22,7 @@ madlib.lm <- function (formula, data, na.action, method,
     
     ## create temp table for db.Rquery objects
     is.tbl.source.temp <- FALSE
-    if (inherits(data, "db.Rquery"))
+    if (is(data, "db.Rquery"))
     {
         tbl.source <- .unique.string()
         is.tbl.source.temp <- TRUE
@@ -49,13 +48,13 @@ madlib.lm <- function (formula, data, na.action, method,
 
     ## execute the linear regression
     res <- try(.db.getQuery(sql, conn.id), silent = TRUE)
-    if (inherits(res, .err.class))
+    if (is(res, .err.class))
         stop("Could not run MADlib linear regression !")
 
     ## retreive result
     res <- try(.db.getQuery(paste("select * from", tbl.output), conn.id),
                silent = TRUE)
-    if (inherits(res, .err.class))
+    if (is(res, .err.class))
         stop("Could not retreive MADlib linear regression result !")
 
     ## drop temporary tables
